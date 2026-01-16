@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions, Platform } from 'react-native';
-import { BookOpen, Calendar, Image as ImageIcon, CreditCard, Bell, Search, Clock, ArrowRight, User } from 'lucide-react-native';
+import { BookOpen, Calendar, Image as ImageIcon, CreditCard, Bell, Search, Clock, ArrowRight, User, Bus } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -177,10 +177,11 @@ export default function DashboardScreen() {
                     {/* Using specific theme colors for these pills */}
                     <QuickPill icon={<BookOpen />} label="Daily Diary" route="DailyDiary" color={THEME.orange} />
                     <QuickPill icon={<BookOpen />} label="Homework" route="Homework" color={THEME.teal} />
-                    <QuickPill icon={<CreditCard />} label="Pay Fees" route="Fees" color={THEME.purple} />
                     <QuickPill icon={<Calendar />} label="Timetable" route="Timetable" color={THEME.indigo} />
-                    <QuickPill icon={<ImageIcon />} label="Gallery" route="Gallery" color="#F472B6" />
+                    <QuickPill icon={<Bus />} label="Transport" route="Transport" color={THEME.red} />  
+                    {/* <QuickPill icon={<ImageIcon />} label="Gallery" route="Gallery" color="#F472B6" /> */}
                     <QuickPill icon={<BookOpen />} label="Library" route="Library" color="#22D3EE" />
+                    <QuickPill icon={<CreditCard />} label="Pay Fees" route="Fees" color={THEME.purple} />
                 </ScrollView>
 
                 {/* Notices Section - Dark Card with Gradient Hint? No, Keep it Solid Dark for Contrast vs Light Theme */}
