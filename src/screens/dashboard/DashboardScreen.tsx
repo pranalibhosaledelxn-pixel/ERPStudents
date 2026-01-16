@@ -178,7 +178,8 @@ export default function DashboardScreen() {
                     <QuickPill icon={<BookOpen />} label="Daily Diary" route="DailyDiary" color={THEME.orange} />
                     <QuickPill icon={<BookOpen />} label="Homework" route="Homework" color={THEME.teal} />
                     <QuickPill icon={<Calendar />} label="Timetable" route="Timetable" color={THEME.indigo} />
-                    <QuickPill icon={<Bus />} label="Transport" route="Transport" color={THEME.red} />  
+                    <QuickPill icon={<Calendar />} label="Events" route="Events" color="#E11D48" />
+                    <QuickPill icon={<Bus />} label="Transport" route="Transport" color={THEME.red} />
                     {/* <QuickPill icon={<ImageIcon />} label="Gallery" route="Gallery" color="#F472B6" /> */}
                     <QuickPill icon={<BookOpen />} label="Library" route="Library" color="#22D3EE" />
                     <QuickPill icon={<CreditCard />} label="Pay Fees" route="Fees" color={THEME.purple} />

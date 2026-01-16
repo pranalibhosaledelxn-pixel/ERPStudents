@@ -18,6 +18,7 @@ import LeaveApplicationScreen from '../screens/leaves/LeaveApplicationScreen';
 import LibraryScreen from '../screens/library/LibraryScreen';
 import DailyDiaryScreen from '../screens/diary/DailyDiaryScreen';
 import TransportScreen from '../screens/transport/TransportScreen';
+import EventsScreen from '../screens/events/EventsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -50,6 +51,7 @@ export default function RootNavigator() {
                         <Stack.Screen name="Library" component={LibraryScreen} />
                         <Stack.Screen name="DailyDiary" component={DailyDiaryScreen} />
                         <Stack.Screen name="Transport" component={TransportScreen} />
+                        <Stack.Screen name="Events" component={EventsScreen} />
                     </>
                 ) : (
                     <Stack.Screen name="Login" component={LoginScreen} />
