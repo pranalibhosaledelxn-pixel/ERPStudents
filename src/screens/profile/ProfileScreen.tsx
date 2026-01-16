@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
-import { ChevronRight, User, Phone, Mail, MapPin, BookOpen, Star, Award, TrendingUp, LogOut, Settings, Camera, Shield, GraduationCap } from 'lucide-react-native';
+import { ChevronRight, User, Phone, Mail, MapPin, BookOpen, Star, Award, TrendingUp, LogOut, Settings, Camera, Shield, GraduationCap, HelpCircle } from 'lucide-react-native';
 import Svg, { Defs, LinearGradient, Stop, Rect, Path } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
@@ -158,6 +158,16 @@ export default function ProfileScreen() {
                         value="Mumbai, India"
                         icon={<MapPin />}
                         color={THEME.danger}
+                    />
+                    <MenuOption
+                        label="Help & FAQ"
+                        icon={<HelpCircle />}
+                        color={THEME.teal}
+                    />
+                    <MenuOption
+                        label="Privacy Policy"
+                        icon={<Shield />}
+                        color={THEME.indigo}
                         isLast
                     />
                 </View>
