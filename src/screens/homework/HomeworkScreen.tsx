@@ -63,14 +63,14 @@ export default function HomeworkScreen() {
                 {/* Horizontal Filters */}
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll} contentContainerStyle={styles.filterContainer}>
                     <FilterChip label="All" />
-                    <FilterChip label="Math" />
+                    <FilterChip label="Mathematics" />
                     <FilterChip label="English" />
                     <FilterChip label="Science" />
                     <FilterChip label="History" />
                 </ScrollView>
 
                 {/* Homework Cards */}
-                {homeworks.map((item) => (
+                {homeworks.filter(item => filter === 'All' || item.subject === filter).map((item) => (
                     <View key={item.id} style={[styles.card, { borderLeftColor: item.color }]}>
                         <View style={styles.cardHeader}>
                             <View style={[styles.subjectBadge, { backgroundColor: item.color + '15' }]}>
