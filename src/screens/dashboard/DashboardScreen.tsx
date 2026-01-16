@@ -14,17 +14,18 @@ const THEME = {
     cardBg: '#FFFFFF',
     textMain: '#1F2937',
     textSub: '#9CA3AF',
-    
+
     // Accents
     teal: '#00E0C6',   // Bright Minty Teal
     purple: '#8B5CF6', // Soft Violet
     indigo: '#6366F1',
     green: '#10B981',
     red: '#EF4444',
-    
+
     // Gradient approximations
-    gradientStart: '#818CF8', 
+    gradientStart: '#818CF8',
     gradientEnd: '#C084FC',
+    orange: '#F59E0B',
 };
 
 export default function DashboardScreen() {
@@ -87,13 +88,13 @@ export default function DashboardScreen() {
     };
 
     const QuickPill = ({ icon, label, route, color }: { icon: any, label: string, route: string, color: string }) => (
-        <TouchableOpacity 
-            style={styles.quickPill} 
+        <TouchableOpacity
+            style={styles.quickPill}
             onPress={() => navigation.navigate(route)}
             activeOpacity={0.7}
         >
             {/* Using a solid circle behind icon for that 'wellness' look */}
-            <View style={[styles.pillIcon, { backgroundColor: color }]}> 
+            <View style={[styles.pillIcon, { backgroundColor: color }]}>
                 {React.cloneElement(icon, { size: 16, color: 'white' })}
             </View>
             <Text style={styles.pillText}>{label}</Text>
@@ -103,7 +104,7 @@ export default function DashboardScreen() {
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-                
+
                 {/* Header */}
                 <View style={styles.header}>
                     <View>
@@ -112,17 +113,17 @@ export default function DashboardScreen() {
                         <Text style={styles.name}>{user?.name?.split(' ')[0]}</Text>
                     </View>
                     <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.profilePill}>
-                         <View style={styles.avatar}>
-                            <Text style={{fontSize: 14}}>👦</Text>
-                         </View>
-                         <Text style={styles.profilePillText}>Profile</Text>
+                        <View style={styles.avatar}>
+                            <Text style={{ fontSize: 14 }}>👦</Text>
+                        </View>
+                        <Text style={styles.profilePillText}>Profile</Text>
                     </TouchableOpacity>
                 </View>
 
                 {/* Hero Bento Grid */}
                 <View style={styles.bentoGrid}>
                     {/* Attendance - Large Square */}
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={[styles.bentoCard, styles.attendanceCard]}
                         onPress={() => navigation.navigate('Attendance')}
                         activeOpacity={0.9}
@@ -135,17 +136,17 @@ export default function DashboardScreen() {
                             <CircularProgress percentage={92} />
                             <View style={styles.attendanceStats}>
                                 <Text style={styles.statDetail}>
-                                    <Text style={{fontWeight: 'bold', color: THEME.teal}}>21</Text> Present
+                                    <Text style={{ fontWeight: 'bold', color: THEME.teal }}>21</Text> Present
                                 </Text>
                                 <Text style={styles.statDetail}>
-                                    <Text style={{fontWeight: 'bold', color: THEME.red}}>02</Text> Absent
+                                    <Text style={{ fontWeight: 'bold', color: THEME.red }}>02</Text> Absent
                                 </Text>
                             </View>
                         </View>
                     </TouchableOpacity>
 
                     {/* Next Class - Tall/Wide */}
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={[styles.bentoCard, styles.nextClassCard]}
                         onPress={() => navigation.navigate('Timetable')}
                         activeOpacity={0.9}
@@ -153,16 +154,16 @@ export default function DashboardScreen() {
                         <View style={[styles.cardBadge, { backgroundColor: THEME.teal + '15' }]}>
                             <Text style={[styles.cardBadgeText, { color: THEME.teal }]}>Next Class</Text>
                         </View>
-                        <View style={{marginTop: 12}}>
-                             <Text style={styles.subjectText}>{nextClass.subject}</Text>
-                             <View style={styles.nextClassRow}>
+                        <View style={{ marginTop: 12 }}>
+                            <Text style={styles.subjectText}>{nextClass.subject}</Text>
+                            <View style={styles.nextClassRow}>
                                 <Clock size={14} color={THEME.textSub} />
                                 <Text style={styles.classDetailText}>{nextClass.time}</Text>
-                             </View>
-                             <View style={styles.nextClassRow}>
+                            </View>
+                            <View style={styles.nextClassRow}>
                                 <User size={14} color={THEME.textSub} />
                                 <Text style={styles.classDetailText}>{nextClass.teacher}</Text>
-                             </View>
+                            </View>
                         </View>
                         <View style={styles.roomPill}>
                             <Text style={styles.roomText}>{nextClass.room}</Text>
@@ -172,32 +173,33 @@ export default function DashboardScreen() {
 
                 {/* Quick Actions - Pills with Solid Circles */}
                 <Text style={styles.sectionTitle}>Quick Actions</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.pillScroll} contentContainerStyle={{paddingHorizontal: 20}}>
-                     {/* Using specific theme colors for these pills */}
-                     <QuickPill icon={<BookOpen />} label="Homework" route="Homework" color={THEME.teal} />
-                     <QuickPill icon={<CreditCard />} label="Pay Fees" route="Fees" color={THEME.purple} /> 
-                     <QuickPill icon={<Calendar />} label="Timetable" route="Timetable" color={THEME.indigo} />
-                     <QuickPill icon={<ImageIcon />} label="Gallery" route="Gallery" color="#F472B6" /> 
-                     <QuickPill icon={<BookOpen />} label="Library" route="Library" color="#22D3EE" />
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.pillScroll} contentContainerStyle={{ paddingHorizontal: 20 }}>
+                    {/* Using specific theme colors for these pills */}
+                    <QuickPill icon={<BookOpen />} label="Daily Diary" route="DailyDiary" color={THEME.orange} />
+                    <QuickPill icon={<BookOpen />} label="Homework" route="Homework" color={THEME.teal} />
+                    <QuickPill icon={<CreditCard />} label="Pay Fees" route="Fees" color={THEME.purple} />
+                    <QuickPill icon={<Calendar />} label="Timetable" route="Timetable" color={THEME.indigo} />
+                    <QuickPill icon={<ImageIcon />} label="Gallery" route="Gallery" color="#F472B6" />
+                    <QuickPill icon={<BookOpen />} label="Library" route="Library" color="#22D3EE" />
                 </ScrollView>
 
                 {/* Notices Section - Dark Card with Gradient Hint? No, Keep it Solid Dark for Contrast vs Light Theme */}
                 <Text style={styles.sectionTitle}>Updates</Text>
-                <TouchableOpacity 
+                <TouchableOpacity
                     style={[styles.bentoCard, styles.noticeCard]}
                     onPress={() => navigation.navigate('NoticeBoard')}
                 >
                     <View style={styles.noticeIcon}>
                         <Bell size={20} color="white" />
                     </View>
-                    <View style={{flex: 1}}>
+                    <View style={{ flex: 1 }}>
                         <Text style={styles.noticeDate}>Today, 9:00 AM</Text>
                         <Text style={styles.noticeText} numberOfLines={2}>School will remain closed tomorrow due to heavy rainfall warning.</Text>
                     </View>
                 </TouchableOpacity>
 
                 {/* Learning Continue Section */}
-                 <TouchableOpacity 
+                <TouchableOpacity
                     style={[styles.bentoCard, styles.learningCard]}
                     onPress={() => navigation.navigate('Learning')}
                 >
@@ -212,16 +214,16 @@ export default function DashboardScreen() {
                     </View>
                     <View style={styles.progressBar}>
                         <Svg height="6" width="100%">
-                             <Defs>
+                            <Defs>
                                 <LinearGradient id="barGrad" x1="0" y1="0" x2="1" y2="0">
                                     <Stop offset="0" stopColor={THEME.gradientStart} stopOpacity="1" />
                                     <Stop offset="1" stopColor={THEME.teal} stopOpacity="1" />
                                 </LinearGradient>
                             </Defs>
-                            <View style={{height: 6, borderRadius: 3, backgroundColor: '#F3F4F6', width: '100%'}}>
-                                 <View style={{height: 6, borderRadius: 3, width: '45%', overflow: 'hidden'}}>
-                                     <Svg height="6" width="100%">
-                                          <Defs>
+                            <View style={{ height: 6, borderRadius: 3, backgroundColor: '#F3F4F6', width: '100%' }}>
+                                <View style={{ height: 6, borderRadius: 3, width: '45%', overflow: 'hidden' }}>
+                                    <Svg height="6" width="100%">
+                                        <Defs>
                                             <LinearGradient id="fillGrad" x1="0" y1="0" x2="1" y2="0">
                                                 <Stop offset="0" stopColor={THEME.gradientStart} stopOpacity="1" />
                                                 <Stop offset="1" stopColor={THEME.teal} stopOpacity="1" />
@@ -229,11 +231,11 @@ export default function DashboardScreen() {
                                         </Defs>
                                         <Circle r={200} cx={-10} cy={3} fill="url(#fillGrad)" />
                                         {/* Hacky fill for gradient bar using rect */}
-                                        <View style={{flex:1, backgroundColor: THEME.gradientStart}} /> 
-                                     </Svg>
-                                 </View>
-                                 {/* Simpler Approach for Bar: Just Solid for now to ensure reliability */}
-                                 <View style={[styles.progressFill, { width: '45%', backgroundColor: THEME.teal }]} />
+                                        <View style={{ flex: 1, backgroundColor: THEME.gradientStart }} />
+                                    </Svg>
+                                </View>
+                                {/* Simpler Approach for Bar: Just Solid for now to ensure reliability */}
+                                <View style={[styles.progressFill, { width: '45%', backgroundColor: THEME.teal }]} />
                             </View>
                         </Svg>
                     </View>
@@ -413,10 +415,10 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         marginRight: 12,
         shadowColor: "#6B7280",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 3,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.03,
+        shadowRadius: 6,
+        elevation: 0,
     },
     pillIcon: {
         width: 28,

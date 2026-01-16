@@ -16,6 +16,7 @@ import ProfileScreen from '../screens/profile/ProfileScreen';
 import TimetableScreen from '../screens/timetable/TimetableScreen';
 import LeaveApplicationScreen from '../screens/leaves/LeaveApplicationScreen';
 import LibraryScreen from '../screens/library/LibraryScreen';
+import DailyDiaryScreen from '../screens/diary/DailyDiaryScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -46,6 +47,7 @@ export default function RootNavigator() {
                         <Stack.Screen name="Timetable" component={TimetableScreen} />
                         <Stack.Screen name="Leaves" component={LeaveApplicationScreen} />
                         <Stack.Screen name="Library" component={LibraryScreen} />
+                        <Stack.Screen name="DailyDiary" component={DailyDiaryScreen} />
                     </>
                 ) : (
                     <Stack.Screen name="Login" component={LoginScreen} />
