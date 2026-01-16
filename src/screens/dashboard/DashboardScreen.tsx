@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions, Platform } from 'react-native';
-import { BookOpen, Calendar, Image as ImageIcon, CreditCard, Bell, Search, Clock, ArrowRight, User, Bus } from 'lucide-react-native';
+import { BookOpen, Calendar, CreditCard, Bell, Search, Clock, ArrowRight, User, Bus } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -118,6 +118,7 @@ export default function DashboardScreen() {
                         </View>
                         <Text style={styles.profilePillText}>Profile</Text>
                     </TouchableOpacity>
+
                 </View>
 
                 {/* Hero Bento Grid */}

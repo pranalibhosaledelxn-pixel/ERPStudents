@@ -7,7 +7,7 @@ import Svg, { Defs, LinearGradient, Stop, Rect, Path } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
 
-// Theme Constants
+// Theme Constant
 const THEME = {
     background: '#F5F7FA',
     textMain: '#1F2937',
@@ -22,11 +22,6 @@ const THEME = {
 export default function ProfileScreen() {
     const insets = useSafeAreaInsets();
     const { user, logout } = useAuth();
-
-    const siblings = [
-        { id: '1', name: 'Aarav', class: 'Sr. KG', active: true, color: THEME.teal },
-        { id: '2', name: 'Vihaan', class: 'Class 4', active: false, color: THEME.purple },
-    ];
 
     // -- Sub Components --
 
@@ -100,17 +95,6 @@ export default function ProfileScreen() {
 
                 {/* 2. Avatar Section (Overlapping Header) */}
                 <View style={styles.profileMetaContainer}>
-                    <View style={styles.siblingContainer}>
-                        {siblings.map((sib) => (
-                            <TouchableOpacity key={sib.id} style={[styles.siblingPill, sib.active && styles.siblingPillActive]} activeOpacity={0.8}>
-                                <View style={[styles.siblingAvatar, { backgroundColor: sib.color }]}>
-                                    <Text style={{ fontSize: 12 }}>👦</Text>
-                                </View>
-                                {sib.active && <Text style={styles.siblingName}>{sib.name}</Text>}
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-
                     <View style={styles.avatarWrapper}>
                         <View style={styles.avatarContainer}>
                             <Text style={styles.avatarText}>👦</Text>
@@ -239,43 +223,6 @@ const styles = StyleSheet.create({
         marginTop: -60, // Overlap effect
         marginBottom: 20,
         paddingHorizontal: 20,
-    },
-    siblingContainer: {
-        flexDirection: 'row',
-        backgroundColor: 'white',
-        padding: 6,
-        borderRadius: 30,
-        marginBottom: 24,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    siblingPill: {
-        padding: 4,
-        borderRadius: 20,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    siblingPillActive: {
-        backgroundColor: '#F3F4F6',
-        paddingRight: 12,
-    },
-    siblingAvatar: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 2,
-        borderColor: 'white',
-    },
-    siblingName: {
-        marginLeft: 8,
-        fontWeight: 'bold',
-        fontSize: 13,
-        color: THEME.textMain,
     },
     avatarWrapper: {
         position: 'relative',

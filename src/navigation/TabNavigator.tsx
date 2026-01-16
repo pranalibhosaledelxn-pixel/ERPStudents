@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Platform, Animated } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Home, Calendar, Image as ImageIcon, Settings } from 'lucide-react-native';
+import { Home, Calendar, Images } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Screens
@@ -131,24 +131,15 @@ export default function TabNavigator() {
                     tabBarLabel: 'Calendar'
                 }}
             />
-            {/* Using PieChart/Activity for a 'Results' or 'Stats' feel if Gallery isn't main priority, 
-                but keeping Gallery as per original code */}
             <Tab.Screen
                 name="Gallery"
                 component={GalleryScreen}
                 options={{
-                    tabBarIcon: ({ color, size }: any) => <ImageIcon color={color} size={size} />,
+                    tabBarIcon: ({ color, size }: any) => <Images color={color} size={size} />,
                     tabBarLabel: 'Gallery'
                 }}
             />
-            <Tab.Screen
-                name="Settings"
-                component={SettingsScreen}
-                options={{
-                    tabBarIcon: ({ color, size }: any) => <Settings color={color} size={size} />,
-                    tabBarLabel: 'Settings'
-                }}
-            />
+
         </Tab.Navigator>
     );
 }
