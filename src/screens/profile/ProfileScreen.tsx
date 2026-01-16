@@ -1,9 +1,8 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Card } from '../../components/Card';
 import { useAuth } from '../../context/AuthContext';
-import { ChevronRight, User, Phone, Mail, MapPin, BookOpen, Star, Award, TrendingUp, LogOut } from 'lucide-react-native';
+import { ChevronRight, User, Phone, Mail, MapPin, BookOpen, Star, Award, TrendingUp, LogOut, Settings, Camera, Shield, GraduationCap } from 'lucide-react-native';
 import Svg, { Defs, LinearGradient, Stop, Rect, Path } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
@@ -22,7 +21,9 @@ const THEME = {
 
 export default function ProfileScreen() {
     const insets = useSafeAreaInsets();
-    const { user, logout } = useAuth(); // Assuming logout is available in context
+    const { user, logout } = useAuth();
+
+    // -- Sub Components --
 
     const StatItem = ({ label, value, icon, color }: any) => (
         <View style={styles.statItem}>
@@ -36,22 +37,24 @@ export default function ProfileScreen() {
         </View>
     );
 
-    const InfoRow = ({ label, value, icon, color }: { label: string, value: string | undefined, icon?: any, color?: string }) => (
-        <View style={styles.infoRow}>
-            <View style={styles.infoLabelContainer}>
-                {icon && (
-                    <View style={[styles.infoIcon, { backgroundColor: (color || THEME.textSub) + '15' }]}>
-                        {React.cloneElement(icon, { size: 18, color: color || THEME.textSub })}
-                    </View>
-                )}
-                <Text style={styles.infoLabel}>{label}</Text>
+    const MenuOption = ({ label, icon, value, color, isLast = false }: { label: string, icon: any, value?: string, color?: string, isLast?: boolean }) => (
+        <TouchableOpacity style={[styles.menuOption, isLast && styles.menuOptionLast]} activeOpacity={0.7}>
+            <View style={styles.menuLeft}>
+                <View style={[styles.menuIconBox, { backgroundColor: (color || THEME.textSub) + '15' }]}>
+                    {React.cloneElement(icon, { size: 20, color: color || THEME.textSub })}
+                </View>
+                <View>
+                    <Text style={styles.menuLabel}>{label}</Text>
+                    {value && <Text style={styles.menuValueLabel}>{value}</Text>}
+                </View>
             </View>
-            <Text style={styles.infoValue}>{value || '-'}</Text>
-        </View>
+            <ChevronRight size={18} color="#D1D5DB" />
+        </TouchableOpacity>
     );
 
-    const GradientHeader = () => (
+    const Header = () => (
         <View style={styles.headerContainer}>
+            {/* Gradient Background */}
             <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
                 <Defs>
                     <LinearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
@@ -61,8 +64,17 @@ export default function ProfileScreen() {
                 </Defs>
                 <Rect x="0" y="0" width="100%" height="100%" fill="url(#grad)" />
             </Svg>
-            {/* Decorative Curve */}
-            <Svg height="40" width="100%" style={styles.curve}>
+
+            {/* Top Bar Actions */}
+            <View style={[styles.topBar, { marginTop: insets.top }]}>
+                <Text style={styles.screenTitle}>My Profile</Text>
+                <TouchableOpacity style={styles.settingsButton}>
+                    <Settings size={20} color="white" />
+                </TouchableOpacity>
+            </View>
+
+            {/* Decorative Bottom Curve */}
+            <Svg height="40" width="100%" style={styles.curve} preserveAspectRatio="none">
                 <Path
                     d={`M0 0 Q${width / 2} 40 ${width} 0 L${width} 40 L0 40 Z`}
                     fill={THEME.background}
@@ -72,27 +84,31 @@ export default function ProfileScreen() {
     );
 
     return (
-        <View style={[styles.container]}>
-            <GradientHeader />
+        <View style={styles.container}>
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+            >
+                {/* 1. Header is now part of the ScrollView flow */}
+                <Header />
 
-            <View style={[styles.topNav, { marginTop: insets.top }]}>
-                {/* Placeholder for custom back button if needed, or simplified header */}
-                <Text style={styles.screenTitle}>My Profile</Text>
-            </View>
-
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-
-                {/* Profile Space */}
-                <View style={styles.profileSection}>
-                    <View style={styles.avatarContainer}>
-                        <Text style={styles.avatarText}>👦</Text>
-                        <View style={styles.onlineBadge} />
+                {/* 2. Avatar Section (Overlapping Header) */}
+                <View style={styles.profileMetaContainer}>
+                    <View style={styles.avatarWrapper}>
+                        <View style={styles.avatarContainer}>
+                            <Text style={styles.avatarText}>👦</Text>
+                        </View>
+                        <View style={styles.cameraBadge}>
+                            <Camera size={14} color="white" />
+                        </View>
                     </View>
+
                     <Text style={styles.userName}>{user?.name}</Text>
-                    <Text style={styles.userClass}>{user?.class} - {user?.division} | Roll No. {user?.rollNumber}</Text>
+                    <Text style={styles.userClass}>{user?.class} - {user?.division} • Roll No. {user?.rollNumber}</Text>
                 </View>
 
-                {/* Quick Stats */}
+                {/* 3. Stats Row */}
                 <View style={styles.statsCard}>
                     <StatItem
                         label="Attendance"
@@ -104,54 +120,55 @@ export default function ProfileScreen() {
                     <StatItem
                         label="Grade"
                         value="A+"
-                        icon={<Award size={20} color={THEME.purple} />}
+                        icon={<GraduationCap size={20} color={THEME.purple} />}
                         color={THEME.purple}
                     />
                     <View style={styles.statDivider} />
                     <StatItem
                         label="Points"
-                        value="1,250"
+                        value="1,240"
                         icon={<Star size={20} color="#F59E0B" />}
                         color="#F59E0B"
                     />
                 </View>
 
-                {/* Info Sections */}
-                <Text style={styles.sectionHeader}>Personal Information</Text>
-
-                <Card style={styles.infoCard}>
-                    <InfoRow
+                {/* 4. Details Menu */}
+                <Text style={styles.sectionTitle}>Personal Details</Text>
+                <View style={styles.menuContainer}>
+                    <MenuOption
                         label="Father's Name"
                         value={user?.parentName}
                         icon={<User />}
                         color={THEME.indigo}
                     />
-                    <InfoRow
+                    <MenuOption
                         label="Mobile Number"
                         value={user?.mobile}
                         icon={<Phone />}
-                        color={THEME.indigo}
+                        color={THEME.teal}
                     />
-                    <InfoRow
+                    <MenuOption
                         label="Email Address"
                         value="parent@school.com"
                         icon={<Mail />}
-                        color={THEME.indigo}
+                        color={THEME.purple}
                     />
-                    <InfoRow
+                    <MenuOption
                         label="Home Address"
-                        value="123, Sunshine Apts, Mumbai"
+                        value="Mumbai, India"
                         icon={<MapPin />}
-                        color={THEME.indigo}
+                        color={THEME.danger}
+                        isLast
                     />
-                </Card>
+                </View>
 
+                {/* 5. Logout */}
                 <TouchableOpacity style={styles.logoutButton} onPress={logout} activeOpacity={0.8}>
                     <LogOut size={20} color="white" />
-                    <Text style={styles.logoutText}>Logout</Text>
+                    <Text style={styles.logoutText}>Log Out</Text>
                 </TouchableOpacity>
 
-                <Text style={styles.versionText}>v1.0.2 • School ERP</Text>
+                <Text style={styles.versionText}>v1.5.0</Text>
 
             </ScrollView>
         </View>
@@ -163,35 +180,53 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: THEME.background,
     },
+    // Header
     headerContainer: {
-        height: 220,
+        height: 240,
+        width: '100%',
+        position: 'relative',
+    },
+    topBar: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        marginTop: 10,
+        height: 50,
+    },
+    screenTitle: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
+        letterSpacing: 0.5,
+    },
+    settingsButton: {
         position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
+        right: 20,
+        padding: 8,
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        borderRadius: 20,
     },
     curve: {
         position: 'absolute',
-        bottom: -1, // Overlap slightly to avoid gaps
+        bottom: -1,
     },
-    topNav: {
-        height: 60,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    screenTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: 'white',
-    },
+
+    // Scroll Content
     scrollContent: {
-        paddingTop: 60, // Space for avatar overlap
-        paddingBottom: 40,
+        paddingBottom: 100, // Enough space for tab bar
+    },
+
+    // Profile Meta
+    profileMetaContainer: {
+        alignItems: 'center',
+        marginTop: -60, // Overlap effect
+        marginBottom: 20,
         paddingHorizontal: 20,
     },
-    profileSection: {
-        alignItems: 'center',
-        marginBottom: 24,
+    avatarWrapper: {
+        position: 'relative',
+        marginBottom: 12,
     },
     avatarContainer: {
         width: 110,
@@ -200,28 +235,28 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 12,
         borderWidth: 4,
         borderColor: 'white',
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
-        shadowRadius: 12,
+        shadowRadius: 10,
         elevation: 8,
-        position: 'relative',
     },
     avatarText: {
         fontSize: 48,
     },
-    onlineBadge: {
+    cameraBadge: {
         position: 'absolute',
-        bottom: 6,
-        right: 6,
-        width: 18,
-        height: 18,
-        borderRadius: 9,
-        backgroundColor: THEME.teal,
-        borderWidth: 3,
+        bottom: 4,
+        right: 4,
+        backgroundColor: THEME.purple,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 2,
         borderColor: 'white',
     },
     userName: {
@@ -235,18 +270,20 @@ const styles = StyleSheet.create({
         color: THEME.textSub,
         fontWeight: '600',
     },
+
+    // Stats
     statsCard: {
         flexDirection: 'row',
         backgroundColor: 'white',
+        marginHorizontal: 20,
         borderRadius: 20,
         padding: 20,
-        marginBottom: 24,
+        marginBottom: 30,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
-        elevation: 2,
-        justifyContent: 'space-between',
+        elevation: 3,
         alignItems: 'center',
     },
     statItem: {
@@ -257,84 +294,91 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 8,
+        justifyContent: 'center',
+        marginBottom: 6,
     },
     statValue: {
         fontSize: 16,
         fontWeight: 'bold',
         color: THEME.textMain,
-        textAlign: 'center',
     },
     statLabel: {
         fontSize: 12,
         color: THEME.textSub,
-        textAlign: 'center',
+        fontWeight: '500',
     },
     statDivider: {
         width: 1,
         height: 30,
         backgroundColor: '#F3F4F6',
     },
-    sectionHeader: {
+
+    // Menu
+    sectionTitle: {
         fontSize: 16,
         fontWeight: 'bold',
         color: THEME.textMain,
+        marginLeft: 24,
         marginBottom: 12,
-        marginLeft: 4,
     },
-    infoCard: {
+    menuContainer: {
         backgroundColor: 'white',
-        borderRadius: 20,
+        marginHorizontal: 20,
+        borderRadius: 24,
         padding: 8,
-        marginBottom: 24,
+        marginBottom: 30,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
         elevation: 2,
     },
-    infoRow: {
+    menuOption: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 14,
-        paddingHorizontal: 12,
+        justifyContent: 'space-between',
+        padding: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#F9FAFB',
+        borderBottomColor: '#F3F4F6',
     },
-    infoLabelContainer: {
+    menuOptionLast: {
+        borderBottomWidth: 0,
+    },
+    menuLeft: {
         flexDirection: 'row',
         alignItems: 'center',
-        width: '40%',
+        flex: 1,
     },
-    infoIcon: {
-        width: 32,
-        height: 32,
-        borderRadius: 12,
-        justifyContent: 'center',
+    menuIconBox: {
+        width: 40,
+        height: 40,
+        borderRadius: 14,
         alignItems: 'center',
-        marginRight: 10,
+        justifyContent: 'center',
+        marginRight: 16,
     },
-    infoLabel: {
+    menuLabel: {
         fontSize: 14,
         color: '#6B7280',
-        fontWeight: '500',
+        marginBottom: 2,
     },
-    infoValue: {
-        flex: 1,
-        fontSize: 14,
-        color: THEME.textMain,
+    menuValueLabel: {
+        fontSize: 16,
         fontWeight: '600',
-        textAlign: 'right',
+        color: THEME.textMain,
     },
+
+    // Logout
     logoutButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: THEME.danger,
-        paddingVertical: 16,
-        borderRadius: 16,
+        marginHorizontal: 20,
+        paddingVertical: 18,
+        borderRadius: 20,
+        marginBottom: 20,
         shadowColor: THEME.danger,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
@@ -351,6 +395,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#D1D5DB',
         fontSize: 12,
-        marginTop: 24,
+        marginBottom: 20,
     }
 });
