@@ -1,36 +1,56 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Switch } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LogOut, User, Bell, Globe, ChevronRight } from 'lucide-react-native';
+import { LogOut, User, Bell, Globe, Moon, Shield, HelpCircle, ChevronRight, Lock } from 'lucide-react-native';
+
+const THEME = {
+    bg: '#F8FAFC',
+    card: '#FFFFFF',
+    textMain: '#1E293B',
+    textSub: '#64748B',
+    border: '#E2E8F0',
+    primary: '#0F766E',
+    secondary: '#7C3AED',
+    danger: '#EF4444',
+};
 
 export default function SettingsScreen() {
     const { logout, user } = useAuth();
     const insets = useSafeAreaInsets();
+    const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+    const [darkMode, setDarkMode] = React.useState(false);
 
-    const SettingItem = ({ icon, title, value, onPress, isDestructive = false }: any) => (
+    // -- Components --
+    const SectionTitle = ({ title }: { title: string }) => (
+        <Text style={styles.sectionTitle}>{title}</Text>
+    );
+
+    const SettingItem = ({ icon, label, value, type = 'link', color, onPress, isLast }: any) => (
         <TouchableOpacity
-            onPress={onPress}
-            style={styles.settingItem}
+            style={[styles.itemContainer, isLast && styles.itemLast]}
+            onPress={type !== 'switch' ? onPress : () => { }}
+            activeOpacity={type === 'switch' ? 1 : 0.7}
         >
             <View style={styles.itemLeft}>
-                <View style={[
-                    styles.iconContainer,
-                    isDestructive ? styles.iconDestructive : styles.iconDefault
-                ]}>
-                    {icon}
+                <View style={[styles.iconBox, { backgroundColor: color + '15' }]}>
+                    {React.cloneElement(icon, { size: 18, color: color })}
                 </View>
-                <Text style={[
-                    styles.itemTitle,
-                    isDestructive ? styles.textDestructive : styles.textDefault
-                ]}>
-                    {title}
-                </Text>
+                <Text style={styles.itemLabel}>{label}</Text>
             </View>
+
             <View style={styles.itemRight}>
-                {value && <Text style={styles.itemValue}>{value}</Text>}
-                <ChevronRight size={18} color="#D1D5DB" />
+                {type === 'value' && <Text style={styles.valueText}>{value}</Text>}
+                {type === 'switch' && (
+                    <Switch
+                        value={value}
+                        onValueChange={onPress}
+                        trackColor={{ false: '#E2E8F0', true: THEME.primary }}
+                        thumbColor={'white'}
+                    />
+                )}
+                {type === 'link' && <ChevronRight size={18} color="#CBD5E1" />}
             </View>
         </TouchableOpacity>
     );
@@ -38,48 +58,97 @@ export default function SettingsScreen() {
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
             <ScreenHeader title="Settings" showBack={false} />
-            <ScrollView contentContainerStyle={styles.scrollContent}>
 
-                {/* Profile Section */}
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+
+                {/* User Profile Card */}
                 <View style={styles.profileCard}>
-                    <View style={styles.avatarContainer}>
-                        <Text style={{ fontSize: 30 }}>👦</Text>
+                    <View style={styles.profileLeft}>
+                        <View style={styles.avatar}>
+                            <Text style={{ fontSize: 24 }}>👦</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.userName}>{user?.name || 'Student Name'}</Text>
+                            <Text style={styles.userRole}>Class {user?.class || 'X'} - {user?.division || 'A'}</Text>
+                        </View>
                     </View>
-                    <Text style={styles.userName}>{user?.name}</Text>
-                    <Text style={styles.userDetails}>Roll No: {user?.rollNumber} • {user?.class} {user?.division}</Text>
+                    <TouchableOpacity style={styles.editBtn}>
+                        <Text style={styles.editBtnText}>Edit</Text>
+                    </TouchableOpacity>
                 </View>
 
-                <Text style={styles.sectionHeader}>Account</Text>
-                <View style={styles.sectionContainer}>
+                {/* Account Settings */}
+                <SectionTitle title="Account" />
+                <View style={styles.cardContainer}>
                     <SettingItem
-                        icon={<User size={18} color="#4B5563" />}
-                        title="Edit Profile"
-                        onPress={() => { }}
+                        label="Personal Details"
+                        icon={<User />}
+                        color={THEME.primary}
+                        type="link"
                     />
                     <SettingItem
-                        icon={<Bell size={18} color="#4B5563" />}
-                        title="Notifications"
-                        value="On"
-                        onPress={() => { }}
+                        label="Change Password"
+                        icon={<Lock />}
+                        color={THEME.secondary}
+                        type="link"
+                        isLast
+                    />
+                </View>
+
+                {/* Preferences */}
+                <SectionTitle title="Preferences" />
+                <View style={styles.cardContainer}>
+                    <SettingItem
+                        label="Notifications"
+                        icon={<Bell />}
+                        color="#F59E0B"
+                        type="switch"
+                        value={notificationsEnabled}
+                        onPress={() => setNotificationsEnabled(!notificationsEnabled)}
                     />
                     <SettingItem
-                        icon={<Globe size={18} color="#4B5563" />}
-                        title="Language"
+                        label="Dark Mode"
+                        icon={<Moon />}
+                        color="#6366F1"
+                        type="switch"
+                        value={darkMode}
+                        onPress={() => setDarkMode(!darkMode)}
+                    />
+                    <SettingItem
+                        label="Language"
+                        icon={<Globe />}
+                        color="#EC4899"
+                        type="value"
                         value="English"
-                        onPress={() => { }}
+                        isLast
                     />
                 </View>
 
-                <View style={[styles.sectionContainer, { marginTop: 24 }]}>
+                {/* Support */}
+                <SectionTitle title="Support" />
+                <View style={styles.cardContainer}>
                     <SettingItem
-                        icon={<LogOut size={18} color="#EF4444" />}
-                        title="Logout"
-                        isDestructive
-                        onPress={logout}
+                        label="Help & FAQ"
+                        icon={<HelpCircle />}
+                        color={THEME.primary}
+                        type="link"
+                    />
+                    <SettingItem
+                        label="Privacy Policy"
+                        icon={<Shield />}
+                        color={THEME.secondary}
+                        type="link"
+                        isLast
                     />
                 </View>
 
-                <Text style={styles.versionText}>App Version 1.0.0</Text>
+                {/* Logout */}
+                <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
+                    <LogOut size={18} color={THEME.danger} />
+                    <Text style={styles.logoutText}>Sign Out</Text>
+                </TouchableOpacity>
+
+                <Text style={styles.versionText}>Version 1.2.0 • Build 2026</Text>
 
             </ScrollView>
         </View>
@@ -89,100 +158,144 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F9FAFB', // gray-50
+        backgroundColor: THEME.bg,
     },
     scrollContent: {
-        paddingBottom: 100,
+        padding: 20,
+        paddingBottom: 40,
     },
+
+    // Profile Card
     profileCard: {
-        backgroundColor: 'white',
-        padding: 24,
-        marginBottom: 24,
+        flexDirection: 'row',
         alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: '#F3F4F6',
+        justifyContent: 'space-between',
+        backgroundColor: 'white',
+        padding: 16,
+        borderRadius: 20,
+        marginBottom: 24,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 2,
+        borderWidth: 1,
+        borderColor: THEME.border,
     },
-    avatarContainer: {
-        width: 80,
-        height: 80,
-        backgroundColor: '#FF8E8E', // primary-light
-        borderRadius: 40,
+    profileLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    avatar: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: '#F0FDFA', // teal-50
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: '#CCFBF1',
     },
     userName: {
-        fontSize: 20,
+        fontSize: 16,
         fontWeight: 'bold',
-        color: '#1F2937',
+        color: THEME.textMain,
     },
-    userDetails: {
-        color: '#6B7280',
-        marginTop: 4,
+    userRole: {
+        fontSize: 13,
+        color: THEME.textSub,
     },
-    sectionHeader: {
-        color: '#6B7280',
+    editBtn: {
+        backgroundColor: '#F1F5F9',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 12,
+    },
+    editBtnText: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: THEME.textMain,
+    },
+
+    // Sections
+    sectionTitle: {
         fontSize: 14,
-        fontWeight: 'bold',
-        marginLeft: 16,
-        marginBottom: 8,
+        fontWeight: '600',
+        color: THEME.textSub,
+        marginBottom: 12,
+        marginLeft: 8,
         textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
-    sectionContainer: {
+    cardContainer: {
         backgroundColor: 'white',
-        borderTopWidth: 1,
-        borderBottomWidth: 1,
-        borderColor: '#F3F4F6',
+        borderRadius: 20,
+        marginBottom: 24,
+        borderWidth: 1,
+        borderColor: THEME.border,
+        overflow: 'hidden', // for children border radius
     },
-    settingItem: {
+    itemContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: 16,
-        backgroundColor: 'white',
         borderBottomWidth: 1,
-        borderBottomColor: '#F9FAFB',
+        borderBottomColor: '#F1F5F9',
+        backgroundColor: 'white',
+    },
+    itemLast: {
+        borderBottomWidth: 0,
     },
     itemLeft: {
         flexDirection: 'row',
         alignItems: 'center',
+        gap: 12,
     },
-    iconContainer: {
+    iconBox: {
         width: 32,
         height: 32,
-        borderRadius: 16,
+        borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        marginRight: 12,
     },
-    iconDefault: {
-        backgroundColor: '#F9FAFB',
-    },
-    iconDestructive: {
-        backgroundColor: '#FEF2F2',
-    },
-    itemTitle: {
-        fontSize: 16,
+    itemLabel: {
+        fontSize: 15,
         fontWeight: '500',
-    },
-    textDefault: {
-        color: '#374151',
-    },
-    textDestructive: {
-        color: '#EF4444',
+        color: THEME.textMain,
     },
     itemRight: {
         flexDirection: 'row',
         alignItems: 'center',
     },
-    itemValue: {
-        color: '#9CA3AF',
-        marginRight: 8,
+    valueText: {
+        fontSize: 14,
+        color: THEME.textSub,
+        marginRight: 4,
+    },
+
+    // Logout
+    logoutBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#FEF2F2', // red-50
+        padding: 16,
+        borderRadius: 20,
+        gap: 8,
+        marginBottom: 24,
+        borderWidth: 1,
+        borderColor: '#FECACA',
+    },
+    logoutText: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: THEME.danger,
     },
     versionText: {
         textAlign: 'center',
-        color: '#9CA3AF',
         fontSize: 12,
-        marginTop: 32,
-    }
+        color: '#94A3B8',
+    },
 });
