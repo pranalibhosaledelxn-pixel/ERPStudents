@@ -1,459 +1,571 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions, Image, Platform } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions, Animated, Easing, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { ChevronLeft, Phone, MapPin, Navigation, Bus, Clock, ShieldCheck } from 'lucide-react-native';
-import Svg, { Circle, Rect, Path } from 'react-native-svg';
+import { ChevronLeft, Phone, MapPin, Bus, Clock, ShieldCheck } from 'lucide-react-native';
+import Svg, { Circle, Rect, Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const THEME = {
-    background: '#F5F7FA',
-    cardBg: '#FFFFFF',
     textMain: '#1F2937',
-    textSub: '#9CA3AF',
-    teal: '#00E0C6',
-    purple: '#8B5CF6',
-    indigo: '#6366F1',
-    green: '#10B981',
-    red: '#EF4444',
-    orange: '#F59E0B',
+    textSub: '#64748B',
+    teal: '#0D9488',
+    tealLight: '#CCFBF1',
+    purple: '#7C3AED',
+    indigo: '#4F46E5',
+    white: '#FFFFFF',
+    offWhite: '#F8FAFC',
 };
 
 export default function TransportScreen() {
     const insets = useSafeAreaInsets();
     const navigation = useNavigation();
 
-    // Mock Status
-    const currentStatus = 'En Route';
-    const subtitle = 'Arriving at Pickup Point in 5 mins';
+    // Animation for Bus Pulse
+    const pulseAnim = useRef(new Animated.Value(1)).current;
 
-    // Timeline Data
+    useEffect(() => {
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(pulseAnim, {
+                    toValue: 1.5,
+                    duration: 1000,
+                    useNativeDriver: true,
+                    easing: Easing.out(Easing.ease),
+                }),
+                Animated.timing(pulseAnim, {
+                    toValue: 1,
+                    duration: 1000,
+                    useNativeDriver: true,
+                    easing: Easing.in(Easing.ease),
+                }),
+            ])
+        ).start();
+    }, []);
+
     const timeline = [
-        { id: 1, time: '02:30 PM', title: 'Bus Left School', status: 'Completed' },
-        { id: 2, time: '02:45 PM', title: 'Route Started', status: 'Completed' },
-        { id: 3, time: '03:10 PM', title: 'Arriving at Sunshine Apts', status: 'active' },
-        { id: 4, time: '03:15 PM', title: 'Drop Complete', status: 'pending' },
+        { id: 1, time: '02:30 PM', title: 'Departed School', status: 'completed' },
+        { id: 2, time: '02:45 PM', title: 'Route Started', status: 'completed' },
+        { id: 3, time: '03:10 PM', title: 'Arriving: Sunshine Apts', status: 'active' },
+        { id: 4, time: '03:15 PM', title: 'Drop Off', status: 'pending' },
     ];
 
-    const ActionButton = ({ icon, label, color, onPress }: any) => (
-        <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: color + '15' }]}
-            onPress={onPress}
-            activeOpacity={0.7}
-        >
-            <View style={[styles.actionIcon, { backgroundColor: color }]}>
-                {icon}
-            </View>
-            <Text style={[styles.actionLabel, { color: THEME.textMain }]}>{label}</Text>
-        </TouchableOpacity>
-    );
-
     return (
-        <View style={[styles.container, { paddingTop: insets.top }]}>
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <View style={styles.container}>
+            {/* 1. IMMERSIVE MAP BACKGROUND (Top 55%) */}
+            <View style={styles.mapHeader}>
+                <Svg height="100%" width="100%" viewBox="0 0 375 400" preserveAspectRatio="xMidYMid slice">
+                    <Defs>
+                        <LinearGradient id="mapOverlay" x1="0" y1="0" x2="0" y2="1">
+                            <Stop offset="0" stopColor="white" stopOpacity="0" />
+                            <Stop offset="0.8" stopColor="#F8FAFC" stopOpacity="0.8" />
+                            <Stop offset="1" stopColor="#F8FAFC" stopOpacity="1" />
+                        </LinearGradient>
+                    </Defs>
+
+                    {/* Abstract Stylized Map Paths */}
+                    <Rect x="0" y="0" width="100%" height="100%" fill="#E0F2FE" />
+
+                    {/* Roads */}
+                    <Path d="M-50 150 Q 80 50 180 150 T 450 150" fill="none" stroke="white" strokeWidth="25" />
+                    <Path d="M-50 150 Q 80 50 180 150 T 450 150" fill="none" stroke="#94A3B8" strokeWidth="18" strokeOpacity={0.2} />
+                    <Path d="M-50 150 Q 80 50 180 150 T 450 150" fill="none" stroke="white" strokeWidth="14" />
+
+                    {/* Active Route */}
+                    <Path d="M-50 150 Q 80 50 180 150" fill="none" stroke={THEME.teal} strokeWidth="6" strokeDasharray="8,8" />
+
+                    {/* Locations */}
+                    <Circle cx="180" cy="150" r="12" fill={THEME.teal} fillOpacity={0.2} />
+                    <Circle cx="180" cy="150" r="6" fill={THEME.teal} />
+
+                    {/* Gradient Overlay for Fade to Bottom */}
+                    <Rect x="0" y="0" width="100%" height="100%" fill="url(#mapOverlay)" />
+                </Svg>
+
+                {/* Floating Bus Marker */}
+                <View style={styles.busMarkerContainer}>
+                    <Animated.View style={[styles.pulseCircle, { transform: [{ scale: pulseAnim }] }]} />
+                    <View style={styles.busIconBubble}>
+                        <Bus size={22} color="white" />
+                    </View>
+                    <View style={styles.timeTag}>
+                        <Text style={styles.timeTagText}>5 min</Text>
+                    </View>
+                </View>
+            </View>
+
+            {/* 2. TOP NAV (Transparent) */}
+            <View style={[styles.topNav, { paddingTop: insets.top }]}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.glassButton}>
                     <ChevronLeft size={24} color={THEME.textMain} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Transport Tracking</Text>
-                <View style={{ width: 40 }} />
+                <View style={styles.liveTag}>
+                    <View style={styles.liveDot} />
+                    <Text style={styles.liveTagText}>LIVE TRACKING</Text>
+                </View>
+                <View style={{ width: 44 }} />
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-
-                {/* Visual Map Mockup */}
-                <View style={styles.mapContainer}>
-                    {/* Placeholder Map Background - Just a generic path graphic */}
-                    <View style={styles.mapBackground}>
-                        <Svg height="100%" width="100%" viewBox="0 0 300 200">
-                            <Path
-                                d="M-20 100 Q 80 20 150 100 T 320 100"
-                                fill="none"
-                                stroke="#E5E7EB"
-                                strokeWidth="15"
-                            />
-                            <Path
-                                d="M-20 100 Q 80 20 150 100 T 320 100"
-                                fill="none"
-                                stroke="white"
-                                strokeWidth="11"
-                            />
-                            {/* Route Progress */}
-                            <Path
-                                d="M-20 100 Q 80 20 150 100"
-                                fill="none"
-                                stroke={THEME.teal}
-                                strokeWidth="4"
-                                strokeDasharray="5,5"
-                            />
-                            {/* School Icon */}
-                            <Circle cx="20" cy="80" r="8" fill={THEME.purple} />
-                            {/* Home Icon */}
-                            <Circle cx="280" cy="110" r="8" fill={THEME.red} />
-                        </Svg>
-
-                        {/* Bus Icon Overlay */}
-                        <View style={styles.busOverlay}>
-                            <View style={styles.pulseRing} />
-                            <View style={styles.busIconContainer}>
-                                <Bus size={20} color="white" />
-                            </View>
-                            <View style={styles.busTooltip}>
-                                <Text style={styles.busTooltipText}>5 mins away</Text>
-                            </View>
+            {/* 3. SCROLLABLE SHEET CONTENT */}
+            <ScrollView
+                style={styles.sheetContainer}
+                contentContainerStyle={{ paddingBottom: 50, paddingTop: height * 0.35 }}
+                showsVerticalScrollIndicator={false}
+            >
+                {/* STATUS CARD (Floating) */}
+                <View style={styles.statusCard}>
+                    <View style={styles.statusRow}>
+                        <View>
+                            <Text style={styles.statusLabel}>Current Status</Text>
+                            <Text style={styles.statusBig}>En Route</Text>
                         </View>
+                        <View style={styles.etaBox}>
+                            <Text style={styles.etaNum}>05</Text>
+                            <Text style={styles.etaUnit}>MINS</Text>
+                        </View>
+                    </View>
+                    <View style={styles.statusDivider} />
+                    <View style={styles.locationRow}>
+                        <MapPin size={16} color={THEME.indigo} />
+                        <Text style={styles.locationText}>Arriving at <Text style={{ fontWeight: 'bold' }}>Sunshine Apartments</Text></Text>
                     </View>
                 </View>
 
-                {/* Status Card */}
-                <View style={styles.statusCard}>
-                    <View style={styles.statusHeader}>
-                        <View>
-                            <Text style={styles.statusTitle}>{currentStatus}</Text>
-                            <Text style={styles.statusSubtitle}>{subtitle}</Text>
-                        </View>
-                        <View style={styles.liveBadge}>
-                            <View style={styles.liveDot} />
-                            <Text style={styles.liveText}>LIVE</Text>
-                        </View>
+                {/* TIMELINE */}
+                <View style={styles.sectionContainer}>
+                    <Text style={styles.sectionHeader}>Journey Timeline</Text>
+                    <View style={styles.timelineBox}>
+                        {timeline.map((item, index) => {
+                            const isLast = index === timeline.length - 1;
+                            const isCompleted = item.status === 'completed';
+                            const isActive = item.status === 'active';
+
+                            return (
+                                <View key={item.id} style={styles.timelineItem}>
+                                    <View style={styles.timelineLeft}>
+                                        <Text style={styles.timelineTime}>{item.time}</Text>
+                                    </View>
+                                    <View style={styles.timelineCenter}>
+                                        <View style={[
+                                            styles.timelineLine,
+                                            isLast && { height: 0 },
+                                            isCompleted ? { backgroundColor: THEME.teal } : { backgroundColor: '#E2E8F0' }
+                                        ]} />
+                                        <View style={[
+                                            styles.timelineDot,
+                                            isCompleted && styles.dotCompleted,
+                                            isActive && styles.dotActive,
+                                        ]}>
+                                            {isCompleted && <View style={styles.innerDot} />}
+                                            {isActive && <View style={styles.activeDotInner} />}
+                                        </View>
+                                    </View>
+                                    <View style={[styles.timelineRight, isActive && styles.activeContent]}>
+                                        <Text style={[styles.timelineTitle, isActive && styles.activeTitle]}>{item.title}</Text>
+                                        {isActive && <Text style={styles.activeSubtitle}>Bus is approaching your stop</Text>}
+                                    </View>
+                                </View>
+                            );
+                        })}
                     </View>
+                </View>
 
-                    {/* Timeline */}
-                    <View style={styles.timelineContainer}>
-                        {timeline.map((item, index) => (
-                            <View key={item.id} style={styles.timelineRow}>
-                                {/* Line Connector */}
-                                {index !== timeline.length - 1 && (
-                                    <View style={[
-                                        styles.timelineLine,
-                                        { backgroundColor: item.status === 'Completed' ? THEME.teal : '#E5E7EB' }
-                                    ]} />
-                                )}
-
-                                {/* Dot */}
-                                <View style={[
-                                    styles.timelineDot,
-                                    item.status === 'Completed' ? { backgroundColor: THEME.teal, borderColor: THEME.teal } :
-                                        item.status === 'active' ? { backgroundColor: 'white', borderColor: THEME.teal, borderWidth: 4 } :
-                                            { backgroundColor: '#E5E7EB', borderColor: '#E5E7EB' }
-                                ]} />
-
-                                {/* Content */}
-                                <View style={[styles.timelineContent, { opacity: item.status === 'pending' ? 0.5 : 1 }]}>
-                                    <Text style={styles.timelineTitle}>{item.title}</Text>
-                                    <Text style={styles.timelineTime}>{item.time}</Text>
+                {/* DRIVER INFO */}
+                <View style={styles.sectionContainer}>
+                    <Text style={styles.sectionHeader}>Driver Details</Text>
+                    <View style={styles.driverCard}>
+                        <View style={styles.driverTop}>
+                            <View style={styles.driverImagePlaceholder}>
+                                <Text style={{ fontSize: 24 }}>👨‍✈️</Text>
+                            </View>
+                            <View style={styles.driverInfo}>
+                                <Text style={styles.driverName}>Ramesh Kumar</Text>
+                                <Text style={styles.busInfo}>Bus No. MH-12-AB-9988</Text>
+                                <View style={styles.ratingRow}>
+                                    <Text style={styles.ratingText}>4.8 Rating</Text>
+                                    <Text style={{ fontSize: 12 }}>⭐</Text>
                                 </View>
                             </View>
-                        ))}
+                        </View>
+
+                        <View style={styles.actionGrid}>
+                            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: THEME.teal }]}>
+                                <Phone size={20} color="white" />
+                                <Text style={styles.actionBtnText}>Call Driver</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: THEME.purple }]}>
+                                <ShieldCheck size={20} color="white" />
+                                <Text style={styles.actionBtnText}>Attendant</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
 
-                {/* Driver & Bus Info */}
-                <Text style={styles.sectionTitle}>Bus Details</Text>
-                <View style={styles.detailsCard}>
-                    <View style={styles.driverRow}>
-                        <View style={styles.driverAvatar}>
-                            <Text style={{ fontSize: 20 }}>👨‍✈️</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <Text style={styles.driverName}>Ramesh Kumar</Text>
-                            <Text style={styles.busNumber}>Bus No. MH-12-AB-9988</Text>
-                        </View>
-                        <View style={styles.ratingContainer}>
-                            <Text style={styles.ratingText}>4.8</Text>
-                            <Text style={{ fontSize: 10 }}>⭐</Text>
-                        </View>
-                    </View>
-
-                    <View style={styles.divider} />
-
-                    <View style={styles.actionsRow}>
-                        <ActionButton
-                            icon={<Phone size={18} color="white" />}
-                            label="Call Driver"
-                            color={THEME.teal}
-                            onPress={() => { }}
-                        />
-                        <ActionButton
-                            icon={<ShieldCheck size={18} color="white" />}
-                            label="Attendant"
-                            color={THEME.purple}
-                            onPress={() => { }}
-                        />
-                    </View>
-                </View>
-
-            </ScrollView>
-        </View>
+            </ScrollView >
+        </View >
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: THEME.background,
+        backgroundColor: THEME.offWhite,
     },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        paddingVertical: 16,
+    // MAP HEADER
+    mapHeader: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: height * 0.55,
+        zIndex: 0,
     },
-    backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: 'white',
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: THEME.textMain,
-    },
-    scrollContent: {
-        paddingBottom: 40,
-    },
-    mapContainer: {
-        height: 220,
-        marginHorizontal: 20,
-        borderRadius: 24,
-        overflow: 'hidden',
-        marginBottom: 20,
-        backgroundColor: '#E0F2FE', // Light blue map water color
-        position: 'relative',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 6,
-        elevation: 1,
-    },
-    mapBackground: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    busOverlay: {
+    busMarkerContainer: {
         position: 'absolute',
         top: '40%',
-        left: '45%',
+        left: '48%',
         alignItems: 'center',
     },
-    busIconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+    busIconBubble: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
         backgroundColor: THEME.teal,
         justifyContent: 'center',
         alignItems: 'center',
+        shadowColor: THEME.teal,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.4,
+        shadowRadius: 16,
+        elevation: 10,
+        zIndex: 2,
         borderWidth: 3,
         borderColor: 'white',
-        zIndex: 2,
     },
-    busTooltip: {
+    pulseCircle: {
         position: 'absolute',
-        top: -30,
-        backgroundColor: 'white',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 8,
-        shadowColor: "#000",
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 1,
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        backgroundColor: THEME.tealLight,
+        opacity: 0.6,
+        top: -16,
+        zIndex: 1,
     },
-    busTooltipText: {
-        fontSize: 10,
+    timeTag: {
+        position: 'absolute',
+        top: -34,
+        backgroundColor: 'white',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 12,
+        shadowColor: 'black',
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    timeTagText: {
+        fontSize: 12,
         fontWeight: 'bold',
         color: THEME.textMain,
     },
-    pulseRing: {
+
+    // TOP NAV
+    topNav: {
         position: 'absolute',
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: THEME.teal,
-        opacity: 0.2,
-        top: -10,
-        left: -10,
+        top: 0,
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingBottom: 10,
+        zIndex: 10,
+    },
+    glassButton: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: 'rgba(255,255,255,0.8)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        // backdropFilter: 'blur(10px)', // Works on some platforms or disregarded
+        shadowColor: 'black',
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+    },
+    liveTag: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        gap: 6,
+        shadowColor: 'black',
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+    },
+    liveDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: '#EF4444',
+    },
+    liveTagText: {
+        fontSize: 10,
+        fontWeight: '800',
+        color: '#EF4444',
+        letterSpacing: 0.5,
+    },
+
+    // SHEET
+    sheetContainer: {
+        flex: 1,
+        zIndex: 5,
     },
     statusCard: {
         marginHorizontal: 20,
         backgroundColor: 'white',
         borderRadius: 24,
         padding: 24,
-        marginBottom: 24,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 6,
-        elevation: 1,
+        shadowColor: '#4F46E5', // Indigo shadow
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.15,
+        shadowRadius: 24,
+        elevation: 10,
+        marginBottom: 32,
     },
-    statusHeader: {
+    statusRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: 24,
+        alignItems: 'center',
+        marginBottom: 20,
     },
-    statusTitle: {
+    statusLabel: {
+        fontSize: 14,
+        color: THEME.textSub,
+        fontWeight: '500',
+        marginBottom: 4,
+    },
+    statusBig: {
+        fontSize: 24,
+        fontWeight: '800', // Extra bold
+        color: THEME.textMain,
+    },
+    etaBox: {
+        alignItems: 'center',
+        backgroundColor: THEME.offWhite,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 16,
+    },
+    etaNum: {
+        fontSize: 20,
+        fontWeight: '900',
+        color: THEME.teal,
+    },
+    etaUnit: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        color: THEME.textSub,
+    },
+    statusDivider: {
+        height: 1,
+        backgroundColor: '#F1F5F9',
+        marginBottom: 16,
+    },
+    locationRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    locationText: {
+        fontSize: 14,
+        color: THEME.textMain,
+    },
+
+    // SECTIONS
+    sectionContainer: {
+        paddingHorizontal: 24,
+        marginBottom: 32,
+    },
+    sectionHeader: {
         fontSize: 18,
         fontWeight: 'bold',
         color: THEME.textMain,
-        marginBottom: 4,
+        marginBottom: 16,
     },
-    statusSubtitle: {
-        fontSize: 13,
-        color: THEME.teal,
-        fontWeight: '600',
-    },
-    liveBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#FEF2F2',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: '#FEE2E2',
-    },
-    liveDot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: THEME.red,
-        marginRight: 6,
-    },
-    liveText: {
-        fontSize: 10,
-        fontWeight: 'bold',
-        color: THEME.red,
-    },
-    timelineContainer: {
+
+    // TIMELINE
+    timelineBox: {
         paddingLeft: 8,
     },
-    timelineRow: {
+    timelineItem: {
         flexDirection: 'row',
-        paddingBottom: 24,
-        position: 'relative',
+        marginBottom: 0,
+        minHeight: 60,
+    },
+    timelineLeft: {
+        width: 70,
+        paddingTop: 0,
+    },
+    timelineTime: {
+        fontSize: 12,
+        color: THEME.textSub,
+        fontWeight: '600',
+        textAlign: 'right',
+        paddingRight: 12,
+    },
+    timelineCenter: {
+        alignItems: 'center',
+        width: 20,
     },
     timelineLine: {
         position: 'absolute',
-        left: 5, // Center of dot (10px / 2)
-        top: 10,
-        bottom: -10, // Extend to next dot
+        top: 0,
+        bottom: 0,
         width: 2,
+        backgroundColor: '#E2E8F0',
+        zIndex: 0,
     },
     timelineDot: {
         width: 12,
         height: 12,
         borderRadius: 6,
-        marginRight: 16,
+        backgroundColor: '#E2E8F0',
+        marginTop: 2,
         zIndex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: 'white',
     },
-    timelineContent: {
-        marginTop: -4, // Align text with dot
+    dotCompleted: {
+        backgroundColor: THEME.teal,
+        borderColor: THEME.teal,
+    },
+    dotActive: {
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        backgroundColor: 'white',
+        borderColor: THEME.teal,
+        borderWidth: 2,
+        marginLeft: 0,
+    },
+    innerDot: {
+        width: 4,
+        height: 4,
+        borderRadius: 2,
+        backgroundColor: 'white'
+    },
+    activeDotInner: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: THEME.teal,
+    },
+    timelineRight: {
+        flex: 1,
+        paddingLeft: 16,
+        paddingBottom: 24,
     },
     timelineTitle: {
         fontSize: 14,
-        fontWeight: '600',
+        color: '#64748B',
+        fontWeight: '500',
+    },
+    activeContent: {
+
+    },
+    activeTitle: {
         color: THEME.textMain,
-        marginBottom: 2,
-    },
-    timelineTime: {
-        fontSize: 12,
-        color: THEME.textSub,
-    },
-    sectionTitle: {
-        fontSize: 18,
         fontWeight: 'bold',
-        color: THEME.textMain,
-        marginHorizontal: 20,
-        marginBottom: 16,
+        fontSize: 15,
     },
-    detailsCard: {
-        marginHorizontal: 20,
+    activeSubtitle: {
+        fontSize: 12,
+        color: THEME.teal,
+        marginTop: 2,
+        fontWeight: '600',
+    },
+
+    // DRIVER
+    driverCard: {
         backgroundColor: 'white',
-        borderRadius: 24,
+        borderRadius: 20,
         padding: 20,
-        marginBottom: 40,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.03,
-        shadowRadius: 4,
-        elevation: 1,
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+        elevation: 2,
     },
-    driverRow: {
+    driverTop: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginBottom: 20,
     },
-    driverAvatar: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: '#F3F4F6',
+    driverImagePlaceholder: {
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        backgroundColor: '#F1F5F9',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 16,
+    },
+    driverInfo: {
+        flex: 1,
     },
     driverName: {
         fontSize: 16,
         fontWeight: 'bold',
         color: THEME.textMain,
-        marginBottom: 2,
     },
-    busNumber: {
+    busInfo: {
         fontSize: 13,
         color: THEME.textSub,
+        marginBottom: 4,
     },
-    ratingContainer: {
+    ratingRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFFBEB',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 8,
         gap: 4,
+        backgroundColor: '#FFF7ED',
+        alignSelf: 'flex-start',
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 8,
     },
     ratingText: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: 'bold',
-        color: '#D97706',
+        color: '#EA580C',
     },
-    divider: {
-        height: 1,
-        backgroundColor: '#F3F4F6',
-        marginVertical: 16,
-    },
-    actionsRow: {
+    actionGrid: {
         flexDirection: 'row',
         gap: 12,
     },
-    actionButton: {
+    actionBtn: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 12,
+        paddingVertical: 14,
         borderRadius: 16,
         gap: 8,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 2,
     },
-    actionIcon: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    actionLabel: {
+    actionBtnText: {
+        color: 'white',
+        fontWeight: 'bold',
         fontSize: 13,
-        fontWeight: '600',
     },
 });
