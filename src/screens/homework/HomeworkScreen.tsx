@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FileText, Download, ChevronLeft, Calendar, CheckCircle, Clock } from 'lucide-react-native';
+import { FileText, Eye, ChevronLeft, Calendar, CheckCircle, Clock } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ScreenHeader } from '../../components/ScreenHeader'; // Or Custom header to match others
 
@@ -97,8 +97,8 @@ export default function HomeworkScreen() {
                             </View>
 
                             <TouchableOpacity style={styles.actionButton}>
-                                <Download size={16} color="white" />
-                                <Text style={styles.actionText}>Download</Text>
+                                <Eye size={16} color="white" />
+                                <Text style={styles.actionText}>View</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
