@@ -24,94 +24,106 @@ export default function LibraryScreen() {
     const navigation = useNavigation();
     const [searchQuery, setSearchQuery] = useState('');
 
-    const categories = [
-        { id: 1, name: 'Animals', icon: '🦁', color: '#FCD34D', bg: '#FFFBEB' }, // Yellow
-        { id: 2, name: 'Space', icon: '🚀', color: '#60A5FA', bg: '#EFF6FF' },   // Blue
-        { id: 3, name: 'Fairy Tales', icon: '🧚', color: '#F472B6', bg: '#FDF2F8' }, // Pink
-        { id: 4, name: 'Science', icon: '⚗️', color: '#34D399', bg: '#ECFDF5' }, // Green
+    // Pre-Primary "Magic Library" Data
+    const storyOfTheDay = {
+        id: 1,
+        title: 'The Very Hungry Caterpillar',
+        author: 'Eric Carle',
+        cover: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=800', // Wide image
+        color: '#FFB547', // Orange
+    };
+
+    const adventureWorlds = [
+        { id: 1, name: 'Animals', icon: '🦁', bg: '#FEF9C3', border: '#FACC15' }, // Yellow
+        { id: 2, name: 'Space', icon: '🚀', bg: '#DBEAFE', border: '#60A5FA' },   // Blue
+        { id: 3, name: 'Fairies', icon: '🧚', bg: '#FCE7F3', border: '#F472B6' }, // Pink
+        { id: 4, name: 'Dinos', icon: '🦖', bg: '#DCFCE7', border: '#4ADE80' },   // Green
     ];
 
-    const newArrivals = [
-        { id: 1, title: 'The Corduroy', author: 'Don Freeman', cover: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=300' },
-        { id: 2, title: 'Space Jam', author: 'Warner Bros', cover: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=300' },
-        { id: 3, title: 'Jungle Book', author: 'Rudyard Kipling', cover: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&q=80&w=300' },
+    const listenAlong = [
+        { id: 1, title: 'Peppa Pig', duration: '5m', color: '#F472B6' },
+        { id: 2, title: 'Baby Shark', duration: '2m', color: '#60A5FA' },
+        { id: 3, title: 'Paw Patrol', duration: '8m', color: '#EF4444' },
     ];
 
-    const trending = [
-        { id: 4, title: 'Harry Potter', author: 'J.K. Rowling', cover: 'https://images.unsplash.com/photo-1626611792822-efad4867af7f?auto=format&fit=crop&q=80&w=300', color: THEME.purple },
-        { id: 5, title: 'Peter Pan', author: 'J.M. Barrie', cover: 'https://images.unsplash.com/photo-1621351183012-e2f9972dd9bf?auto=format&fit=crop&q=80&w=300', color: THEME.teal },
-    ];
+    // -- Components --
 
-    const CategoryCard = ({ item }: { item: any }) => (
-        <TouchableOpacity
-            style={[styles.categoryCard, { backgroundColor: item.bg, borderColor: item.color }]}
-            activeOpacity={0.8}
-        >
-            <Text style={styles.categoryIcon}>{item.icon}</Text>
-            <Text style={[styles.categoryName, { color: '#374151' }]}>{item.name}</Text>
+    const HeroStory = ({ item }: { item: any }) => (
+        <TouchableOpacity style={styles.heroCard} activeOpacity={0.9}>
+            <Image source={{ uri: item.cover }} style={styles.heroImage} resizeMode="cover" />
+            <View style={styles.heroOverlay}>
+                <View style={styles.heroTag}>
+                    <Star size={14} color="white" fill="white" />
+                    <Text style={styles.heroTagText}>Story of the Day</Text>
+                </View>
+                <Text style={styles.heroTitle}>{item.title}</Text>
+            </View>
         </TouchableOpacity>
     );
 
-    const BookCard = ({ item, large = false }: { item: any, large?: boolean }) => (
-        <TouchableOpacity style={[styles.bookCard, large && styles.bookCardLarge]} activeOpacity={0.9}>
-            <View style={[styles.bookCoverContainer, large && styles.bookCoverLarge]}>
-                <Image source={{ uri: item.cover }} style={styles.bookCover} resizeMode="cover" />
-                {/* Shine effect overlay could go here */}
+    const WorldCard = ({ item }: { item: any }) => (
+        <TouchableOpacity
+            style={[styles.worldCard, { backgroundColor: item.bg, borderColor: item.border }]}
+            activeOpacity={0.8}
+        >
+            <Text style={styles.worldIcon}>{item.icon}</Text>
+            <Text style={styles.worldName}>{item.name}</Text>
+        </TouchableOpacity>
+    );
+
+    const AudioTrack = ({ item }: { item: any }) => (
+        <TouchableOpacity style={styles.audioTrack} activeOpacity={0.7}>
+            <View style={[styles.playCircle, { backgroundColor: item.color }]}>
+                <Text style={{ fontSize: 14 }}>▶️</Text>
             </View>
-            <Text style={styles.bookTitle} numberOfLines={1}>{item.title}</Text>
-            <Text style={styles.bookAuthor} numberOfLines={1}>{item.author}</Text>
+            <View style={{ flex: 1 }}>
+                <Text style={styles.trackTitle}>{item.title}</Text>
+                <Text style={styles.trackDuration}>{item.duration} • Watch & Listen</Text>
+            </View>
+            <Heart size={20} color="#E5E7EB" />
         </TouchableOpacity>
     );
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
-            {/* Playful Header */}
+            {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <ChevronLeft size={24} color={THEME.textMain} />
+                    <ChevronLeft size={28} color="#1F2937" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>My Library 📚</Text>
-                <View style={{ width: 40 }} />
+                <Text style={styles.headerTitle}>✨ Magic Library</Text>
+                <View style={[styles.avatarContainer, { backgroundColor: '#FCD34D' }]}>
+                    <Text style={{ fontSize: 20 }}>👦</Text>
+                </View>
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-                {/* Search Bar */}
-                <View style={styles.searchContainer}>
-                    <Search size={20} color={THEME.textSub} />
+                {/* Search */}
+                <View style={styles.searchBar}>
+                    <Search size={24} color="#9CA3AF" />
                     <TextInput
                         style={styles.searchInput}
-                        placeholder="Find stories..."
-                        placeholderTextColor={THEME.textSub}
-                        value={searchQuery}
-                        onChangeText={setSearchQuery}
+                        placeholder="Look for books..."
+                        placeholderTextColor="#9CA3AF"
                     />
                 </View>
 
-                {/* Explore Categories */}
-                <Text style={styles.sectionTitle}>Explore</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.shelfScroll}>
-                    {categories.map(cat => <CategoryCard key={cat.id} item={cat} />)}
-                </ScrollView>
+                {/* Hero Section */}
+                <Text style={styles.sectionTitle}>Start Here 🌟</Text>
+                <HeroStory item={storyOfTheDay} />
 
-                {/* New Arrivals Shelf */}
-                <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>New Arrivals ✨</Text>
-                    <TouchableOpacity>
-                        <Text style={styles.seeAllText}>See All</Text>
-                    </TouchableOpacity>
+                {/* Worlds Grid */}
+                <Text style={styles.sectionTitle}>Pick a World 🌍</Text>
+                <View style={styles.worldsGrid}>
+                    {adventureWorlds.map(world => <WorldCard key={world.id} item={world} />)}
                 </View>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.shelfScroll}>
-                    {newArrivals.map(book => <BookCard key={book.id} item={book} />)}
-                </ScrollView>
 
-                {/* Trending */}
-                <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>Trending Now 🔥</Text>
+                {/* Listen Along */}
+                <Text style={styles.sectionTitle}>Listen & Dance 🎵</Text>
+                <View style={styles.audioList}>
+                    {listenAlong.map(track => <AudioTrack key={track.id} item={track} />)}
                 </View>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.shelfScroll}>
-                    {trending.map(book => <BookCard key={book.id} item={book} large />)}
-                </ScrollView>
 
             </ScrollView>
         </View>
@@ -121,7 +133,7 @@ export default function LibraryScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: THEME.background,
+        backgroundColor: '#FDFBF7', // Creamy warm background
     },
     header: {
         flexDirection: 'row',
@@ -131,130 +143,166 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
     },
     backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 48,
+        height: 48,
+        borderRadius: 24,
         backgroundColor: 'white',
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
+        borderWidth: 2,
+        borderColor: '#F3F4F6',
     },
     headerTitle: {
-        fontSize: 22, // Larger and more fun
-        fontWeight: '800', // Extra bold
-        color: THEME.textMain,
+        fontSize: 24,
+        fontWeight: '900',
+        color: '#1F2937',
+    },
+    avatarContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: 'white',
     },
     scrollContent: {
         paddingBottom: 40,
     },
-    searchContainer: {
+    searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: 'white',
         marginHorizontal: 20,
         marginBottom: 24,
-        paddingHorizontal: 16,
-        paddingVertical: 12, // Taller search bar
-        borderRadius: 24, // Very rounded
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
+        padding: 16,
+        borderRadius: 24,
+        borderWidth: 2,
+        borderColor: '#E5E7EB',
     },
     searchInput: {
         flex: 1,
         marginLeft: 12,
-        fontSize: 16,
-        color: THEME.textMain,
+        fontSize: 18,
         fontWeight: '600',
-    },
-    sectionHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        marginBottom: 16,
-        marginTop: 8,
+        color: '#1F2937',
     },
     sectionTitle: {
-        fontSize: 18,
+        fontSize: 22,
         fontWeight: '800',
-        color: THEME.textMain,
-        paddingHorizontal: 20,
+        color: '#1F2937',
+        marginLeft: 20,
         marginBottom: 16,
     },
-    seeAllText: {
-        fontSize: 14,
+    // Hero
+    heroCard: {
+        marginHorizontal: 20,
+        height: 200,
+        borderRadius: 30,
+        marginBottom: 32,
+        overflow: 'hidden',
+        position: 'relative',
+        backgroundColor: 'white',
+        elevation: 8,
+        shadowColor: '#F59E0B',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.2,
+        shadowRadius: 16,
+    },
+    heroImage: {
+        width: '100%',
+        height: '100%',
+    },
+    heroOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        padding: 20,
+        backgroundColor: 'rgba(0,0,0,0.3)', // Slight tint for readability
+    },
+    heroTag: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F59E0B',
+        alignSelf: 'flex-start',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 12,
+        marginBottom: 8,
+    },
+    heroTagText: {
+        color: 'white',
         fontWeight: 'bold',
-        color: THEME.teal,
+        fontSize: 12,
+        marginLeft: 4,
     },
-    shelfScroll: {
+    heroTitle: {
+        color: 'white',
+        fontSize: 24,
+        fontWeight: '900',
+        textShadowColor: 'rgba(0,0,0,0.3)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 4,
+    },
+    // Worlds
+    worldsGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
         paddingHorizontal: 20,
-        paddingBottom: 24, // Space for shadows
+        gap: 16,
+        marginBottom: 32,
     },
-    categoryCard: {
-        width: 100,
-        height: 100,
+    worldCard: {
+        width: (width - 56) / 2,
+        aspectRatio: 1,
+        borderRadius: 24,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderBottomWidth: 6, // 3D Pop
+    },
+    worldIcon: {
+        fontSize: 40,
+        marginBottom: 8,
+    },
+    worldName: {
+        fontSize: 18,
+        fontWeight: '800',
+        color: '#374151',
+    },
+    // Audio
+    audioList: {
+        paddingHorizontal: 20,
+        gap: 16,
+    },
+    audioTrack: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        padding: 16,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#F3F4F6',
+        elevation: 1,
+    },
+    playCircle: {
+        width: 48,
+        height: 48,
         borderRadius: 24,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 16,
-        borderWidth: 2,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
     },
-    categoryIcon: {
-        fontSize: 32,
-        marginBottom: 8,
-    },
-    categoryName: {
-        fontSize: 12,
+    trackTitle: {
+        fontSize: 16,
         fontWeight: 'bold',
+        color: '#1F2937',
     },
-    bookCard: {
-        width: 120,
-        marginRight: 20,
-    },
-    bookCardLarge: {
-        width: 150,
-    },
-    bookCoverContainer: {
-        width: '100%',
-        height: 160,
-        borderRadius: 16,
-        overflow: 'hidden',
-        marginBottom: 12,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
-        elevation: 6,
-        backgroundColor: 'white', // Fallback
-    },
-    bookCoverLarge: {
-        height: 200,
-    },
-    bookCover: {
-        width: '100%',
-        height: '100%',
-    },
-    bookTitle: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: THEME.textMain,
-        marginBottom: 2,
-    },
-    bookAuthor: {
-        fontSize: 12,
-        color: THEME.textSub,
-        fontWeight: '500',
+    trackDuration: {
+        fontSize: 13,
+        color: '#9CA3AF',
+        fontWeight: '600',
+        marginTop: 2,
     },
 });
